@@ -1,0 +1,16 @@
+#!/bin/bash
+
+files_changed=$(git diff --diff-filter=d --cached --name-only | grep -E '^*.py')
+limit=9
+
+echo $files_changed | while read file;
+do
+  score=$(pylint $file | tail -n 2 | cut -d "/" -f 1 | cut -d " " -f 7 | cut -d "." -f 1)
+  if (( $score < $limit ));
+  then
+    echo "Pylint score <9. Commit cancelled."
+    exit 1
+  fi
+
+done
+
